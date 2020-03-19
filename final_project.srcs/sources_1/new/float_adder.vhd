@@ -1,98 +1,110 @@
-----------------------------------------------------------------------------------
--- Company: Indiana University
--- Engineer: Chathura Widanage
--- 
--- Create Date: 03/10/2020 10:33:13 PM
--- Design Name: 
--- Module Name: float_adder - Behavioral
--- Project Name: 
--- Target Devices: 
--- Tool Versions: 
--- Description: 
--- 
--- Dependencies: 
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
-----------------------------------------------------------------------------------
 
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
-entity float_multiplier is
-    Port ( 
-        A, B: in std_logic_vector(31 downto 0);
-        O : out std_logic_vector(31 downto 0);
-        CLK : in std_logic
+entity float_adder is
+    port (
+    clk: in std_logic;
+    f1: in std_logic_vector(31 downto 0);
+    f2: in std_logic_vector(31 downto 0);
+    out1: out std_logic_vector(31 downto 0)
     );
-end float_multiplier;
+end float_adder;
 
-architecture float_multiplier of float_multiplier is
+architecture float_adder of float_adder is
 
-   
 begin
-    sync_stuff: process (CLK, A, B)
-    -- declaring variables
-    variable a_sign: std_logic;
-    variable a_exponent: std_logic_vector(7 downto 0);
-    variable a_mantissa: std_logic_vector(23 downto 0);
+    process(clk) is
+    variable e1: unsigned(7 downto 0) := (others => '0');
+    variable e2: unsigned(7 downto 0) := (others => '0');
+    variable newe: unsigned(7 downto 0) := (others => '0');
+    variable m1: std_logic_vector(22 downto 0) := (others => '0');
+    variable m2: std_logic_vector(22 downto 0) := (others => '0');
     
-    variable b_sign: std_logic;
-    variable b_exponent: std_logic_vector(7 downto 0);
-    variable b_mantissa: std_logic_vector(23 downto 0);
+    variable newm1: unsigned(24 downto 0) := (others => '0');
+    variable newm2: unsigned(24 downto 0) := (others => '0');
+    variable addm: std_logic_vector(24 downto 0) := (others => '0');
+    variable newm: std_logic_vector(22 downto 0) := (others => '0');
+
+    variable dif: integer := 0;
     
-    -- output variables
-    variable o_sign: std_logic;
-    variable o_exponent: std_logic_vector(7 downto 0);
-    variable o_mantissa: std_logic_vector(22 downto 0);
+
+    variable over: integer := 1;
+    variable shift: integer := 0;
+    variable mval: std_logic_vector(24 downto 0) := (others => '0');
     
-    variable mantissa_mul : std_logic_vector(47 downto 0);
-    
-    variable x,y: integer;
-    variable z: integer;
-    
+    variable sign: std_logic := '0';
     begin
-        if rising_edge(CLK) then
-           -- assigning values to the variables
-           a_sign := A(31);
-           b_sign := B(31);
-           o_sign := a_sign xor b_sign;
-           
-           a_exponent(7 downto 0) := A(30 downto 23);
-           b_exponent(7 downto 0) := B(30 downto 23);
-           
-           a_mantissa(22 downto 0) := A(22 downto 0);
-           a_mantissa(23) := '1';
-           b_mantissa(22 downto 0) := B(22 downto 0);
-           b_mantissa(23) := '1';
-           
-           -- handle infinity case
-           if a_exponent="011111111" or b_exponent="011111111" then
-            o_exponent := "11111111";
-            o_mantissa := (others=>'0');
+        if rising_edge(clk) then
+             e1 := unsigned(f1(30 downto 23));
+             e2 := unsigned(f2(30 downto 23));
+             m1 := f1(22 downto 0);
+             m2 := f2(22 downto 0);
+             
+             if e1 < e2 then
+                 dif := to_integer(e2 - e1);
+                
+                 newm1 := shift_right(unsigned("01" & m1), dif);
+                 newm2 := unsigned("01" & m2);
+                 
+                 newe := e2;
+             else
+                 dif := to_integer(e1 - e2);
+                 
+                 newm1 := unsigned("01" & m1);
+                 newm2 := shift_right(unsigned("01" & m2), dif);
+                 
+                 newe := e1;
+             end if;
+             
+             if f1(31) = '1' then
+                if f2(31) = '1' then
+                    sign := '1';
+                    addm := std_logic_vector(newm1 + newm2);
+                else
+                    if newm1 < newm2 then
+                        sign := '0';
+                        addm := std_logic_vector(newm2 - newm1);    
+                    else
+                        sign := '1';
+                        addm := std_logic_vector(newm1 - newm2);
+                    end if;
+                end if;
+             else
+                if f2(31) = '1' then
+                    if newm1 < newm2 then
+                        sign := '1';
+                        addm := std_logic_vector(newm2 - newm1);
+                    else
+                        sign := '0';
+                        addm := std_logic_vector(newm1 - newm2);
+                    end if;
+                else
+                    sign := '0';
+                    addm := std_logic_vector(newm1 + newm2);
+                end if;
+             end if;
+                       
+             over := 1;
+             shift := 0;
+             for i in 24 downto 0 loop
+                --report "Logic " & std_logic'image(m(i));
+                 if addm(i) = '1' then
+                     exit;
+                 end if; 
+                 over := over - 1;
+                 shift := shift + 1;   
+             end loop;
             
-           elsif a_exponent="000000000" or b_exponent="000000000" then
-            o_exponent := (others=>'0');
-            o_mantissa := (others=>'0');
-           else
-            x := to_integer(unsigned(a_mantissa));
-            y := to_integer(unsigned(b_mantissa));
-            z := x*y;
-            mantissa_mul := std_logic_vector(to_unsigned(z, mantissa_mul'length));
-            o_mantissa := mantissa_mul(46 downto 24);
+             addm := std_logic_vector(shift_left(unsigned(addm), shift));
             
-            o_exponent := std_logic_vector(to_signed(to_integer(unsigned(a_exponent)) + to_integer(unsigned(b_exponent)) - 127, o_exponent'length));
-           end if;
-           
-           -- assign values to the output
-           O(31)<= o_sign;
-           O(30 downto 23) <= o_exponent;
-           O(22 downto 0) <= o_mantissa;
+             newm := addm(23 downto 1);
+             newe := newe + over; 
+             
+             out1 <= sign & std_logic_vector(newe) & newm;
         end if;
     end process;
 
-end float_multiplier;
+end float_adder;
