@@ -25,11 +25,11 @@ begin
         CLK <= '0';
         A <= "01000000110111110000000000000000"; -- 6.96875
         B <= "10111110101011110000000001101001"; -- −0.3418
-        wait for 10 ns;
+        wait for 200 ns;
         
         CLK <= '1';
         
-        wait for 50 ns;
+        wait for 10000 ms;
 
         std.env.stop;
     end process;
