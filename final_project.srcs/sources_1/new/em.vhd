@@ -28,7 +28,7 @@ shared variable i: integer :=0;
 begin
     float_muls:
         for i in 0 to 7 generate
-            fmx : float_multiplier port map (CLK=>CLK, A=>A((i*31)+7 downto i*31), 
-                        B=> B((i*31)+7 downto i*31), O=>O((i*31)+7 downto i*31));
+            fmx : float_multiplier port map (CLK=>CLK, A=>A((i*32)+31 downto i*32), 
+                        B=> B((i*32)+31 downto i*32), O=>O((i*32)+31 downto i*32));
     end generate float_muls;
 end em;
