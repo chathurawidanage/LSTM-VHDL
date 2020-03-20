@@ -22,14 +22,25 @@ architecture array_elem_sum of array_elem_sum is
 
 shared variable i: integer :=0;     
 signal ints: std_logic_vector(191 downto 0);
+signal clks: std_logic_vector(5 downto 1);
 
 begin
+    process (CLK)
+    begin
+        clk_loop:
+        for i in 5 downto 1 loop
+            if (i mod 2)=0 then
+                    clks(i) <= CLK;
+            else
+                    clks(i) <= not CLK;
+            end if;
+        end loop clk_loop;
+    end process;
     ad0 : float_adder port map (clk=>CLK, f1=>A(255 downto 224), 
         f2=>A(223 downto 192), out1=>ints(191 downto 160));
-        
     elem_sums:
         for i in 5 downto 1 generate
-            adx: float_adder port map (clk=>CLK, 
+            adx: float_adder port map (clk=>clks(i), 
                 f1=>A((i*32)+31 downto (i*32)),
                 f2=>ints((i*32)+31 downto (i*32)),
                 out1=>ints(((i-1)*32)+31 downto ((i-1)*32))
