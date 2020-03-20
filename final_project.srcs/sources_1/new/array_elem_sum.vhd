@@ -21,7 +21,7 @@ architecture array_elem_sum of array_elem_sum is
 
 
 shared variable i: integer :=0;     
-signal ints: std_logic_vector(255 downto 0);
+signal ints: std_logic_vector(191 downto 0);
 
 begin
     ad0 : float_adder port map (clk=>CLK, f1=>A(255 downto 224), 
