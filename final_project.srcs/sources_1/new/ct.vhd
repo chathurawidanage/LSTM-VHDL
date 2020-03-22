@@ -25,7 +25,7 @@ end ct;
 architecture ct of ct is
     component gb
         port(
-            clk: std_logic;
+            clk: in std_logic;
             h: in std_logic_vector(255 downto 0);
             wh: in std_logic_vector(2047 downto 0);
             x: in std_logic_vector(31 downto 0);
