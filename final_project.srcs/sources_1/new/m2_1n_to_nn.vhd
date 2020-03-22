@@ -31,7 +31,6 @@ end component;
 
 signal B_T: std_logic_vector(2047 downto 0);
 signal B_T_MUL: std_logic_vector(2047 downto 0);
-signal OUT_SIG: std_logic_vector(255 downto 0);
 
 shared variable i,j: integer := 0;
 
