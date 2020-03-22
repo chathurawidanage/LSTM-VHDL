@@ -45,14 +45,5 @@ begin
         emx: em port map (A=>B_T((256*i) + 255 downto (256*i)), B=>A, O=> B_T_MUL((256*i) + 255 downto (256*i)), CLK=>CLK);
         smx: array_elem_sum port map(CLK=>CLK, A=>B_T_MUL((256*i) + 255 downto (256*i)), O=>O((32*i) + 31 downto (32*i)));
     end generate row_loop;
-        
---    sm0: array_elem_sum port map(CLK=>CLK, A=>B_T_MUL(255 downto 0), O=>O(31 downto 0));
---    sm1: array_elem_sum port map(CLK=>CLK, A=>B_T_MUL(511 downto 256), O=>O(63 downto 32));
---    sm2: array_elem_sum port map(CLK=>CLK, A=>B_T_MUL(767 downto 512), O=>O(95 downto 64));
---    sm3: array_elem_sum port map(CLK=>CLK, A=>B_T_MUL(1023 downto 768), O=>O(127 downto 96));
---    sm4: array_elem_sum port map(CLK=>CLK, A=>B_T_MUL(1279 downto 1024), O=>O(159 downto 128));
---    sm5: array_elem_sum port map(CLK=>CLK, A=>B_T_MUL(1535 downto 1280), O=>O(191 downto 160));
---    sm6: array_elem_sum port map(CLK=>CLK, A=>B_T_MUL(1791 downto 1536), O=>O(223 downto 192));
---    sm7: array_elem_sum port map(CLK=>CLK, A=>B_T_MUL(2047 downto 1792), O=>O(255 downto 224));
 end m2_1n_to_nn;
     
