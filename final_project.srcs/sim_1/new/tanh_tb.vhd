@@ -6,6 +6,12 @@ entity tanh_tb is
 end tanh_tb;
 
 architecture tanh_tb of tanh_tb is
+
+    constant ClockFrequency : integer := 100e6;
+    constant ClockPeriod : time := 1000 ms / ClockFrequency;
+    
+    signal clk : std_logic := '1';
+    
     component tanh
         Port(
             A: in std_logic_vector(31 downto 0);
@@ -16,45 +22,15 @@ architecture tanh_tb of tanh_tb is
     
     signal A : std_logic_vector(31 downto 0);
     signal O : std_logic_vector(31 downto 0);
-    signal CLK : std_logic;
     
 begin
-    uut: tanh port map (A=>A, O=>O, CLK=>CLK);
+    
+    clk <= not clk after ClockPeriod / 2;
+    
+    uut: tanh port map (A=>A, O=>O, CLK=>clk);
     stim_proc: process
     begin
-        CLK <= '0';
         A<= "00111111111100011110101110000101"; --1.89
         wait for 200 ns;
-        CLK <= '1';
-        wait for 200 ns;
-        CLK <= '0';
-        wait for 200 ns;
-        CLK <= '1';
-        wait for 200 ns;
-        CLK <= '0';
-        wait for 200 ns;
-        CLK <= '1';
-        wait for 200 ns;
-        CLK <= '0';
-        wait for 200 ns;
-        CLK <= '1';
-        wait for 200 ns;
-        CLK <= '0';
-        wait for 200 ns;
-        CLK <= '1';
-        wait for 200 ns;
-        CLK <= '0';
-        wait for 200 ns;
-        CLK <= '1';
-        wait for 200 ns;
-        CLK <= '0';
-        wait for 200 ns;
-        CLK <= '1';
-        wait for 200 ns;
-        CLK <= '0';
-        wait for 200 ns;
-        CLK <= '1';
-        wait for 200 ns;
-        CLK <= '0';
     end process;
 end tanh_tb;

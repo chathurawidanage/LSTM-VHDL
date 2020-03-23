@@ -1,3 +1,4 @@
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
@@ -6,31 +7,65 @@ entity float_multiplier_tb is
 end float_multiplier_tb;
 
 architecture float_multiplier_tb of float_multiplier_tb is
+    constant ClockFrequency : integer := 100e6;
+    constant ClockPeriod : time := 1000 ms / ClockFrequency;
+    
+    signal clk : std_logic := '1';
+    
     component float_multiplier
-    port(
-        A,B : in std_logic_vector(31 downto 0);
-        O: out std_logic_vector(31 downto 0);
-        CLK : in std_logic
-    );
+        port(
+        CLK: in std_logic;
+        A: in std_logic_vector(31 downto 0);
+        B: in std_logic_vector(31 downto 0);
+        O: out std_logic_vector(31 downto 0)
+        );
     end component;
-    
-    signal A,B : std_logic_vector(31 downto 0);
-    signal CLK: std_logic;
-    signal O: std_logic_vector(31 downto 0);
+    signal f1: std_logic_vector(31 downto 0) := (others => '0');
+    signal f2: std_logic_vector(31 downto 0) := (others => '0');
+    signal out1: std_logic_vector(31 downto 0) := (others => '0');
 begin
-    UUT: float_multiplier port map(A=>A, B=>B, O=>O, CLK=>CLK);
+    FM: float_multiplier port map (
+        A => f1,
+        B => f2,
+        O => out1,
+        CLK => clk
+    );
     
-    stim_proc: process
+    clk <= not clk after ClockPeriod / 2;
+    
+    process is
     begin
-        CLK <= '0';
-        A <= "01000000110111110000000000000000"; -- 6.96875
-        B <= "10111110101011110000000001101001"; -- −0.3418
-        wait for 200 ns;
+        f1 <= x"3fa00000"; -- 1.25
+        f2 <= x"3e800000"; -- 0.25
         
-        CLK <= '1';
+        wait for 60 ns;
+        f1 <= x"3e800000";
+        f2 <= x"3fa00000";
+    
+        wait for 60 ns;
         
-        wait for 10000 ms;
-
-        std.env.stop;
+        f1 <= x"3fa00000";  -- 1.25 
+        f2 <= x"3c23d70a";  -- 0.01
+    
+        wait for 60 ns;
+        
+        f1 <= x"3fa00000";  -- 1.25 
+        f2 <= x"bc23d70a";  -- -0.01
+    
+        wait for 60 ns;
+        
+        
+        f1 <= x"bfa00000";  -- -1.25 
+        f2 <= x"bc23d70a";  -- -0.01
+    
+        wait for 60 ns;
+   
+        f1 <= x"bfa00000";  -- -1.25 
+        f2 <= x"3c23d70a";  -- 0.01
+    
+        wait for 60 ns;
+        
+        wait;
     end process;
+
 end float_multiplier_tb;

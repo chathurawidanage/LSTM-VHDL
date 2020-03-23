@@ -30,11 +30,12 @@ begin
 
     variable dif: integer := 0;
     
-
     variable over: integer := 1;
     variable shift: integer := 0;
     variable mval: std_logic_vector(24 downto 0) := (others => '0');
     
+    variable tempe: integer := 0;
+
     variable sign: std_logic := '0';
     begin
         if rising_edge(clk) then
@@ -43,6 +44,7 @@ begin
              m1 := f1(22 downto 0);
              m2 := f2(22 downto 0);
              
+             -- Determine the smallest exponent and shift mantessa
              if e1 < e2 then
                  dif := to_integer(e2 - e1);
                 
@@ -59,6 +61,7 @@ begin
                  newe := e1;
              end if;
              
+             -- Derrive final sign and mantessa
              if f1(31) = '1' then
                 if f2(31) = '1' then
                     sign := '1';
@@ -87,6 +90,7 @@ begin
                 end if;
              end if;
                        
+             -- Normalize the mantessa          
              over := 1;
              shift := 0;
              for i in 24 downto 0 loop
@@ -101,8 +105,14 @@ begin
              addm := std_logic_vector(shift_left(unsigned(addm), shift));
             
              newm := addm(23 downto 1);
-             newe := newe + over; 
+
+             tempe := to_integer(newe) + over;
+
+             if tempe > -1 then
+                newe := to_unsigned(tempe, 8);
+             end if;
              
+             -- Creating final output sign + exponent + mantessa
              out1 <= sign & std_logic_vector(newe) & newm;
         end if;
     end process;

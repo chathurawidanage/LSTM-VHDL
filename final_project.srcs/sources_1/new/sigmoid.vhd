@@ -4,9 +4,11 @@ use IEEE.NUMERIC_STD.ALL;
 
 
 entity sigmoid is
-    Port ( Y : in STD_LOGIC_VECTOR (31 downto 0);
-           O : out STD_LOGIC_VECTOR (31 downto 0);
-           clk: in STD_LOGIC );
+    Port ( 
+        Y : in STD_LOGIC_VECTOR (31 downto 0);
+        O : out STD_LOGIC_VECTOR (31 downto 0);
+        clk: in STD_LOGIC 
+        );
 end sigmoid;
 
 architecture Behavioral of sigmoid is
@@ -193,7 +195,7 @@ begin
                         x3fac <= x"3c690364"; -- 0.014222
                         x4fac <= x"ba4069e8"; -- -0.000734
                         x5fac <= x"00000000"; -- 0.0
-                        report "1.5 <= x";
+                        --report "1.5 <= x";
                     end if;
                 end if;
            else
@@ -205,7 +207,7 @@ begin
                         x3fac <= x"3c690364"; -- 0.014222
                         x4fac <= x"3a4069e8"; -- 0.000734
                         x5fac <= x"00000000"; -- 0.0
-                        report "-1.5 >= x";
+                        --report "-1.5 >= x";
                     end if;
                 end if;
            end if;
