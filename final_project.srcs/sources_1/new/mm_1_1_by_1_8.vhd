@@ -4,7 +4,7 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity mm_1_1_by_1_8 is
     port(
-        clk: std_logic;
+        clk: in std_logic;
         x : in std_logic_vector(31 downto 0);
         y : in std_logic_vector(255 downto 0);
         o : out std_logic_vector(255 downto 0)
